@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			*{
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+				font-family: Arial;
+				cursor: none;
+			}
+			#disp{
+				width: 100vw;
+				height: 100vh;
+				text-align: center;
+				line-height: 100vh;
+				font-size: 50vmin;
+				color: black;
+			}
+			#disp.green{
+				background-color: #50d852;
+				color: rgba(255, 255, 255, 0.5);
+			}
+			#disp.red{
+				background-color: #d85050;
+				color: rgba(255, 255, 255, 0.5);
+			}
+			#disp.blue{
+				background-color: #5086d8;
+				color: rgba(255, 255, 255, 0.5);
+			}
+			.button{
+				width: 33.333vw;
+				height: 100vh;
+				position: fixed;
+				top: 0;
+				color: rgba(255, 255, 255, 0.5);
+				font-size: 40vmin;
+				text-align: center;
+				line-height: 100vh;
+			}
+			.button:nth-child(1){
+				left: 0;
+				background-color: #50d852;
+			}
+			.button:nth-child(2){
+				left: calc(50vw - 16.667vw);
+				background-color: #5086d8;
+			}
+			.button:nth-child(3){
+				right: 0;
+				background-color: #d85050;
+			}
+		</style>
+		<script src="https://www.gstatic.com/firebasejs/5.5.6/firebase.js"></script>
+	</head>
+	<body>
+		<div id="disp"></div>
+		<div id="mobile-buttons">
+			<div class="button" onclick="send(1)">&#10003;</div>
+			<div class="button" onclick="send(2)">?</div>
+			<div class="button" onclick="send(-1)">&#10005;</div>
+		</div>
+		<script>
+			var mobile = navigator.userAgent.match("Mobile")!=null||navigator.userAgent.match("Linux;")!=null;
+			
+			var config = {
+				apiKey: "AIzaSyBCeTVF1RvVNAefmETbBgLOv6lN0btN0q8",
+				authDomain: "online-stuff-3e092.firebaseapp.com",
+				databaseURL: "https://online-stuff-3e092.firebaseio.com",
+				projectId: "online-stuff-3e092",
+				storageBucket: "online-stuff-3e092.appspot.com",
+				messagingSenderId: "878238554342"
+			};
+			firebase.initializeApp(config);
+			var database = firebase.database();
+			var disp = document.getElementById("disp");
+			var mobileButtons = document.getElementById("mobile-buttons");
+			
+			function send(n){
+				database.ref("lies").set({v: n, r: Math.random()});
+			}
+			
+			if(mobile){
+				disp.outerHTML = "";
+			}else{
+				mobileButtons.outerHTML = "";
+				var check = "&#10003;";
+				var x = "&#10005;";
+				var q = "?";
+				var val = 0; //1 = true, 0 = no result, -1 = false, 2 == unknown
+				function update(){
+					if(val == 2){
+						disp.innerHTML = q;
+						disp.className = "blue";
+					}
+					if(val == 1){
+						disp.innerHTML = check;
+						disp.className = "green";
+					}
+					if(val == 0){
+						disp.innerHTML = "";
+						disp.className = "";
+					}
+					if(val == -1){
+						disp.innerHTML = x;
+						disp.className = "red";
+					}
+				}
+				update();
+				
+				var lastTimeout = null;
+				database.ref("lies").on("value", function(e){
+					clearTimeout(lastTimeout);
+					val = e.val().v;
+					update();
+					lastTimeout = window.setTimeout(function(){
+						val = 0;
+						update();
+					}, 2000);
+				});
+			}
+		</script>
+	</body>
+</html>
