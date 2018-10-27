@@ -9,6 +9,10 @@
 				font-family: Arial;
 				cursor: none;
 			}
+			body{
+				width: 100vw;
+				height: 100vh;
+			}
 			#disp{
 				width: 100vw;
 				height: 100vh;
@@ -38,6 +42,13 @@
 				font-size: 40vmin;
 				text-align: center;
 				line-height: 100vh;
+				transition: all 0.5s;
+			}
+			.sideways>.button{
+				width: 100vw;
+				height: 33.333%;
+				left: 0 !important;
+				line-height: 33.333vh;
 			}
 			.button:nth-child(1){
 				left: 0;
@@ -51,15 +62,25 @@
 				right: 0;
 				background-color: #d85050;
 			}
+			.sideways>.button:nth-child(1){
+				top: 0;
+			}
+			.sideways>.button:nth-child(2){
+				top: calc(50% - 16.667%);
+			}
+			.sideways>.button:nth-child(3){
+				top: auto;
+				bottom: 0;
+			}
 		</style>
 		<script src="https://www.gstatic.com/firebasejs/5.5.6/firebase.js"></script>
 	</head>
 	<body>
 		<div id="disp"></div>
-		<div id="mobile-buttons">
-			<div class="button" onclick="send(1)">&#10003;</div>
-			<div class="button" onclick="send(2)">?</div>
-			<div class="button" onclick="send(-1)">&#10005;</div>
+		<div id="mobile-buttons" class="sideways">
+			<div class="button" ontouchstart="send(1)">&#10003;</div>
+			<div class="button" ontouchstart="send(2)">?</div>
+			<div class="button" ontouchstart="send(-1)">&#10005;</div>
 		</div>
 		<script>
 			var mobile = navigator.userAgent.match("Mobile")!=null||navigator.userAgent.match("Linux;")!=null;
@@ -83,6 +104,11 @@
 			
 			if(mobile){
 				disp.outerHTML = "";
+				function sideways(e){
+					mobileButtons.className = window.orientation == 0 ? "sideways" : "";
+				}
+				window.onorientationchange = sideways;
+				sideways();
 			}else{
 				mobileButtons.outerHTML = "";
 				var check = "&#10003;";
